@@ -15,8 +15,10 @@ using std::vector;
 
 Process::Process(int pid) {
   pid_ = pid;
-  cpu_util_ =
-      float(LinuxParser::ActiveJiffies(Pid())) / float(LinuxParser::Jiffies());
+  // long process_jiffies = LinuxParser::ActiveJiffies(Pid());
+  // long total_jiffies = LinuxParser::Jiffies();
+  // cpu_util_ = float(process_jiffies) / total_jiffies;
+  cpu_util_ = LinuxParser::ActiveJiffies(Pid()) / float(LinuxParser::Jiffies());
 }
 
 int Process::Pid() { return pid_; }
