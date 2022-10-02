@@ -111,6 +111,7 @@ long LinuxParser::ActiveJiffies(int pid) {
   string line;
   string key;
   string value;
+  long totaltime;
   vector<string> proc_jiffies;
   std::ifstream filestream(kProcDirectory + std::to_string(pid) +
                            kStatFilename);
@@ -120,10 +121,11 @@ long LinuxParser::ActiveJiffies(int pid) {
       while (linestream >> value) {
         proc_jiffies.push_back(value);
       }
+      totaltime = std::stol(proc_jiffies[13]) + std::stol(proc_jiffies[14]) +
+                  std::stol(proc_jiffies[15]) + std::stol(proc_jiffies[16]);
     }
   }
-  return std::stol(proc_jiffies[13]) + std::stol(proc_jiffies[14]) +
-         std::stol(proc_jiffies[15]) + std::stol(proc_jiffies[16]);
+  return totaltime;
 }
 
 long LinuxParser::ActiveJiffies() {
