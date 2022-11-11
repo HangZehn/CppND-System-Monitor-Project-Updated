@@ -59,7 +59,7 @@ vector<int> LinuxParser::Pids() {
       string filename(file->d_name);
       if (std::all_of(filename.begin(), filename.end(), isdigit)) {
         int pid = stoi(filename);
-        pids.push_back(pid);
+        pids.emplace_back(pid);
       }
     }
   }
@@ -119,7 +119,7 @@ long LinuxParser::ActiveJiffies(int pid) {
     while (std::getline(filestream, line)) {
       std::istringstream linestream(line);
       while (linestream >> value) {
-        proc_jiffies.push_back(value);
+        proc_jiffies.emplace_back(value);
       }
       totaltime = std::stol(proc_jiffies[13]) + std::stol(proc_jiffies[14]) +
                   std::stol(proc_jiffies[15]) + std::stol(proc_jiffies[16]);
@@ -157,7 +157,7 @@ vector<string> LinuxParser::CpuUtilization() {
       std::istringstream linestream(line);
       linestream >> key;
       while (linestream >> value) {
-        jiffies.push_back(value);
+        jiffies.emplace_back(value);
       }
     }
   }
@@ -219,7 +219,9 @@ string LinuxParser::Ram(int pid) {
     while (std::getline(filestream, line)) {
       std::istringstream linestream(line);
       linestream >> key;
-      if (key == "VmSize:") {
+      if (key ==
+          "VmRSS:") {  // recommended to use VmRSS instead of VmSize, by review:
+                       // https://review.udacity.com/#!/reviews/3750075
         linestream >> memory_int;
         memory = std::to_string(memory_int / 1000);
       }
@@ -275,9 +277,11 @@ long LinuxParser::UpTime(int pid) {
     while (std::getline(filestream, line)) {
       std::istringstream linestream(line);
       while (linestream >> key) {
-        values.push_back(key);
+        values.emplace_back(key);
       }
     }
   }
-  return std::stol(values[21]);
+  // return std::stol(values[21]);
+  int upTimePid = UpTime() - stol(values[21]) / sysconf(_SC_CLK_TCK);
+  return upTimePid;
 }
